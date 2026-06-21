@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSSP Simulator — Comparativa de Algoritmos</title>
+  <meta name="description" content="Simulación interactiva de cuatro algoritmos SSSP: Dijkstra, Bellman-Ford, Det. O(m log²/³ n) y Thorup. Observa cómo escalan con vértices y aristas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="badge">Algoritmos de Teoría de Grafos</div>
+      <h1>SSSP <span class="accent">Simulator</span></h1>
+      <p class="hero-sub">
+        Simulación comparativa de cuatro algoritmos de caminos más cortos desde un origen.
+        Observa en tiempo real cómo el número de <strong>vértices (n)</strong> y
+        <strong>aristas (m)</strong> afecta su ventaja teórica.
+      </p>
+      <div class="algo-pills">
+        <span class="pill dijkstra">Dijkstra</span>
+        <span class="pill bellman">Bellman-Ford</span>
+        <span class="pill det">Det O(m log²/³ n)</span>
+        <span class="pill thorup">Thorup</span>
+      </div>
+    </div>
+    <div class="scroll-hint">↓ Explorar</div>
+  </header>
+
+  <!-- ══ ALGORITMOS INFO ════════════════════════════════════════════════════ -->
+  <section class="section algo-cards-section">
+    <div class="section-title">
+      <h2>Los Cuatro Algoritmos</h2>
+      <p>Cada uno representa una era diferente en la historia del problema SSSP</p>
+    </div>
+    <div class="algo-cards">
+
+      <div class="algo-card dijkstra-card" id="card-dijkstra">
+        <div class="card-icon">⬡</div>
+        <div class="card-tag">Clásico · 1959</div>
+        <h3>Dijkstra</h3>
+        <div class="complexity">O((m + n) log n)</div>
+        <p>Usa un heap binario (<code>priority_queue</code>) para extraer siempre
+          el vértice de menor distancia tentativa. La operación de extracción
+          cuesta O(log n), y en total se realizan O(m) relajaciones.</p>
+        <ul class="pros-cons">
+          <li class="pro">✓ Muy eficiente en grafos dispersos</li>
+          <li class="pro">✓ Fácil de implementar</li>
+          <li class="con">✗ Solo pesos no negativos</li>
+          <li class="con">✗ Limitado por la barrera de ordenamiento</li>
+        </ul>
+      </div>
+
+      <div class="algo-card bellman-card" id="card-bellman">
+        <div class="card-icon">↺</div>
+        <div class="card-tag">General · 1958</div>
+        <h3>Bellman-Ford</h3>
+        <div class="complexity">O(m · n)</div>
+        <p>Relaja <em>todas</em> las aristas exactamente n−1 veces. En cada
+          pasada puede mejorar distancias de vértices que Dijkstra no procesaría
+          hasta más tarde. Detecta ciclos negativos.</p>
+        <ul class="pros-cons">
+          <li class="pro">✓ Admite pesos negativos</li>
+          <li class="pro">✓ Detecta ciclos negativos</li>
+          <li class="con">✗ Cuadrático — muy lento en grafos grandes</li>
+          <li class="con">✗ Simulado solo para n ≤ 2000</li>
+        </ul>
+      </div>
+
+      <div class="algo-card det-card" id="card-det">
+        <div class="card-icon">⊛</div>
+        <div class="card-tag">Teórico · DMMSY 2025</div>
+        <h3>Det. O(m log<sup>2/3</sup> n)</h3>
+        <div class="complexity">O(m log²/³ n)</div>
+        <p>El primer algoritmo determinista que <strong>rompe la barrera del
+          ordenamiento</strong> (Ω(n log n)). Organiza los vértices en K = log²/³ n
+          niveles jerárquicos con cubetas de anchura variable en cada nivel.</p>
+        <ul class="pros-cons">
+          <li class="pro">✓ Sublogarítmico — mejor que Dijkstra para m grande</li>
+          <li class="pro">✓ Determinista (no aleatorio)</li>
+          <li class="con">✗ Muy complejo de implementar completamente</li>
+          <li class="con">✗ Reciente — sin impl. de producción (2025)</li>
+        </ul>
+      </div>
+
+      <div class="algo-card thorup-card" id="card-thorup">
+        <div class="card-icon">∞</div>
+        <div class="card-tag">Óptimo · Thorup 1999</div>
+        <h3>Thorup</h3>
+        <div class="complexity">O(m + n)</div>
+        <p>Lineal en el modelo Word RAM para grafos no dirigidos con pesos enteros.
+          Evita ordenar los vértices construyendo una jerarquía de componentes
+          donde grupos de vértices se procesan en cualquier orden.</p>
+        <ul class="pros-cons">
+          <li class="pro">✓ Lineal — asintóticamente óptimo</li>
+          <li class="pro">✓ No necesita ordenar vértices</li>
+          <li class="con">✗ Solo pesos enteros no negativos</li>
+          <li class="con">✗ Constantes grandes — complicado en práctica</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SIMULADOR INTERACTIVO ══════════════════════════════════════════════ -->
+  <section class="section simulator-section">
+    <div class="section-title">
+      <h2>Simulador Interactivo</h2>
+      <p>Ajusta los parámetros del grafo y observa cómo crece el número de operaciones teóricas</p>
+    </div>
+
+    <div class="sim-layout">
+
+      <!-- Panel de control -->
+      <div class="control-panel glass-card">
+        <h3 class="panel-title">⚙ Configuración del Grafo</h3>
+
+        <div class="control-group">
+          <label for="slider-n">Vértices (n)</label>
+          <div class="slider-row">
+            <input type="range" id="slider-n" min="10" max="100000" value="1000" step="10" />
+            <output id="out-n" class="slider-val">1,000</output>
+          </div>
+          <div class="slider-marks">
+            <span>10</span><span>1k</span><span>10k</span><span>50k</span><span>100k</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="slider-m">Aristas (m)</label>
+          <div class="slider-row">
+            <input type="range" id="slider-m" min="10" max="5000000" value="5000" step="100" />
+            <output id="out-m" class="slider-val">5,000</output>
+          </div>
+          <div class="slider-marks">
+            <span>10</span><span>50k</span><span>500k</span><span>2.5M</span><span>5M</span>
+          </div>
+        </div>
+
+        <div class="density-badge-wrap">
+          <span class="density-label">Densidad del grafo</span>
+          <span id="density-badge" class="density-badge">Disperso</span>
+        </div>
+
+        <div class="preset-row">
+          <button class="preset-btn" onclick="setPreset('sparse')" id="btn-sparse">Disperso</button>
+          <button class="preset-btn active" onclick="setPreset('medium')" id="btn-medium">Medio</button>
+          <button class="preset-btn" onclick="setPreset('dense')" id="btn-dense">Denso</button>
+          <button class="preset-btn" onclick="setPreset('huge')" id="btn-huge">Grande</button>
+        </div>
+
+        <div class="bf-warning" id="bf-warning" style="display:none">
+          ⚠ Bellman-Ford no se simula para n > 2,000 (complejidad cuadrática)
+        </div>
+
+        <!-- Botón de simulación -->
+        <button class="sim-btn" id="sim-btn" onclick="runSimulation()">
+          <span class="sim-btn-icon">▶</span> Ejecutar Simulación
+        </button>
+      </div>
+
+      <!-- Panel de operaciones en vivo -->
+      <div class="live-panel glass-card">
+        <h3 class="panel-title">🔢 Operaciones Teóricas (escala a gran escala)</h3>
+        <div class="ops-grid" id="ops-grid">
+          <div class="ops-card dijkstra-ops" id="ops-dijkstra">
+            <div class="ops-algo">Dijkstra</div>
+            <div class="ops-formula">(m + n) · log₂(n)</div>
+            <div class="ops-count" id="count-dijkstra">—</div>
+            <div class="ops-bar-wrap"><div class="ops-bar dijkstra-bar" id="bar-dijkstra"></div></div>
+          </div>
+          <div class="ops-card bellman-ops" id="ops-bellman">
+            <div class="ops-algo">Bellman-Ford</div>
+            <div class="ops-formula">m · n</div>
+            <div class="ops-count" id="count-bellman">—</div>
+            <div class="ops-bar-wrap"><div class="ops-bar bellman-bar" id="bar-bellman"></div></div>
+            <div class="ops-skip" id="skip-bellman" style="display:none">SKIP (n > 2k)</div>
+          </div>
+          <div class="ops-card det-ops" id="ops-det">
+            <div class="ops-algo">Det O(m log²/³ n)</div>
+            <div class="ops-formula">m · log(n)^(2/3)</div>
+            <div class="ops-count" id="count-det">—</div>
+            <div class="ops-bar-wrap"><div class="ops-bar det-bar" id="bar-det"></div></div>
+          </div>
+          <div class="ops-card thorup-ops" id="ops-thorup">
+            <div class="ops-algo">Thorup</div>
+            <div class="ops-formula">m + n</div>
+            <div class="ops-count" id="count-thorup">—</div>
+            <div class="ops-bar-wrap"><div class="ops-bar thorup-bar" id="bar-thorup"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ ANIMACIÓN DE PASOS ════════════════════════════════════════════════ -->
+  <section class="section steps-section">
+    <div class="section-title">
+      <h2>Simulación de Ejecución</h2>
+      <p>Visualiza cómo cada algoritmo recorre el grafo paso a paso</p>
+    </div>
+    <div class="steps-layout">
+      <div class="graph-canvas-wrap glass-card">
+        <canvas id="graph-canvas" width="500" height="340"></canvas>
+        <div class="canvas-legend">
+          <span class="leg-item"><span class="dot unvisited"></span> Sin visitar</span>
+          <span class="leg-item"><span class="dot frontier"></span> Frontera</span>
+          <span class="leg-item"><span class="dot visited"></span> Finalizado</span>
+          <span class="leg-item"><span class="dot source"></span> Origen</span>
+        </div>
+      </div>
+      <div class="step-controls glass-card">
+        <h3 class="panel-title">🎮 Controles de Animación</h3>
+        <div class="algo-tabs" id="algo-tabs">
+          <button class="tab-btn active" onclick="selectAlgo('dijkstra')" id="tab-dijkstra">Dijkstra</button>
+          <button class="tab-btn" onclick="selectAlgo('bellman')" id="tab-bellman">Bellman-Ford</button>
+          <button class="tab-btn" onclick="selectAlgo('det')" id="tab-det">Det. Log²/³</button>
+          <button class="tab-btn" onclick="selectAlgo('thorup')" id="tab-thorup">Thorup</button>
+        </div>
+        <div class="step-info" id="step-info">
+          <div class="step-num">Paso <span id="step-current">0</span> / <span id="step-total">0</span></div>
+          <div class="step-desc" id="step-desc">Selecciona un algoritmo y presiona ▶ para comenzar</div>
+        </div>
+        <div class="step-dist" id="step-dist-panel">
+          <div class="dist-title">Distancias actuales</div>
+          <div class="dist-grid" id="dist-grid"></div>
+        </div>
+        <div class="anim-controls">
+          <button class="anim-btn" id="btn-prev" onclick="stepPrev()">◀◀ Anterior</button>
+          <button class="anim-btn primary" id="btn-play" onclick="togglePlay()">▶ Play</button>
+          <button class="anim-btn" id="btn-next" onclick="stepNext()">Siguiente ▶▶</button>
+        </div>
+        <div class="speed-control">
+          <label>Velocidad</label>
+          <input type="range" id="speed-slider" min="100" max="2000" value="800" step="100" />
+          <span id="speed-label">Normal</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GRÁFICAS DE COMPLEJIDAD ════════════════════════════════════════════ -->
+  <section class="section charts-section">
+    <div class="section-title">
+      <h2>Curvas de Complejidad</h2>
+      <p>Ventaja teórica de cada algoritmo al escalar n y m</p>
+    </div>
+
+    <div class="charts-tabs">
+      <button class="chart-tab active" onclick="switchChart('n')" id="ctab-n">Variando n (m = 2n)</button>
+      <button class="chart-tab" onclick="switchChart('m')" id="ctab-m">Variando m (n = 1000)</button>
+      <button class="chart-tab" onclick="switchChart('ratio')" id="ctab-ratio">Ratio vs Dijkstra</button>
+    </div>
+
+    <div class="chart-wrap glass-card">
+      <canvas id="complexity-chart" height="350"></canvas>
+    </div>
+
+    <div class="chart-insight glass-card" id="chart-insight">
+      <div class="insight-icon">💡</div>
+      <div class="insight-text" id="insight-text">
+        Selecciona una vista para ver el análisis de ventaja teórica.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TABLA DE REFERENCIA ════════════════════════════════════════════════ -->
+  <section class="section table-section">
+    <div class="section-title">
+      <h2>Tabla Comparativa de Referencia</h2>
+      <p>Estimaciones de operaciones teóricas para distintos tamaños de grafo</p>
+    </div>
+    <div class="table-wrap glass-card">
+      <table id="ref-table">
+        <thead>
+          <tr>
+            <th>n</th><th>m</th>
+            <th class="th-dijkstra">Dijkstra<br/><small>O((m+n)logn)</small></th>
+            <th class="th-bellman">Bellman-Ford<br/><small>O(mn)</small></th>
+            <th class="th-det">Det O(m log²/³ n)<br/><small>DMMSY 2025</small></th>
+            <th class="th-thorup">Thorup<br/><small>O(m+n)</small></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>Simulación SSSP — Implementación en C++ + Visualización Web</p>
+      <p class="footer-note">Dijkstra (1959) · Bellman-Ford (1958) · DMMSY (arXiv:2504.17033, 2025) · Thorup (JACM 1999)</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
