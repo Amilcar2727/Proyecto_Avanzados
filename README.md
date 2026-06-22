@@ -1,11 +1,5 @@
 # Algoritmos-Avanzados-SSSP
 ## Comparativa Experimental de Algoritmos de Caminos Más Cortos desde una Fuente (SSSP)
-
-## Integrantes:
-- Bustinza Quispe, Jose Manuel        224867
-- Estacio Medrano, Amilcar            200822
-- Mayhuire Chacón, Brenda Lucia       231445
-- Salcedo Ataulluco, Mirco Sair       200886
 ---
 
 ## Objetivo del Proyecto
