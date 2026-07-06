@@ -1,0 +1,84 @@
+%% ============================================================
+%%  datos.tex  —  Sección 1.3
+%% ============================================================
+
+\subsection{Datos utilizados}
+
+\subsubsection{Origen de los datos}
+
+Todos los datos utilizados en este proyecto son \textbf{sintéticos}, generados
+proceduralmente mediante la función \texttt{generateRandomGraph(n, m, maxW,
+seed)} definida en \texttt{graph.h}. No se utilizaron conjuntos de datos
+externos, repositorios públicos ni grafos reales.
+
+La elección de datos sintéticos responde a varios factores:
+
+\begin{itemize}
+  \item \textbf{Control experimental:} permite variar de forma independiente
+    y exacta los parámetros $n$, $m$ y $w_{\max}$.
+  \item \textbf{Reproducibilidad determinista:} la semilla del generador
+    Mersenne Twister (\texttt{std::mt19937}) garantiza grafos idénticos entre
+    ejecuciones.
+  \item \textbf{Escalabilidad:} es posible generar instancias de cualquier
+    tamaño sin restricciones de disponibilidad o formato.
+\end{itemize}
+
+\subsubsection{Descripción del conjunto de datos}
+
+Cada grafo generado es un \textbf{grafo dirigido} con pesos enteros en el
+rango $[1, w_{\max}]$ donde $w_{\max} = 1\,000$ en todos los experimentos.
+El algoritmo de generación garantiza la \textit{conectividad débil} del grafo
+mediante los siguientes pasos:
+
+\begin{enumerate}
+  \item Se genera una permutación aleatoria de los $n$ vértices.
+  \item Se insertan $n-1$ aristas dirigidas entre vértices consecutivos de
+    dicha permutación, formando un árbol de expansión dirigido.
+  \item Se agregan aristas adicionales de forma aleatoria (con auto-bucles
+    descartados) hasta alcanzar el objetivo \texttt{targetEdges}, con un
+    límite de $10 \times \texttt{targetEdges}$ intentos para evitar bucles
+    infinitos en grafos muy pequeños.
+\end{enumerate}
+
+\noindent El número de aristas real $m_{\text{real}}$ puede diferir
+ligeramente del objetivo $m_{\text{target}}$ si el número de intentos se
+agota (lo que ocurre raramente en los rangos evaluados).
+
+La Tabla~\ref{tab:rangos} resume los rangos de los parámetros empleados en
+el proyecto.
+
+\begin{table}[H]
+  \centering
+  \caption{Rango de parámetros de los grafos generados.}
+  \label{tab:rangos}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Parámetro} & \textbf{Rango} & \textbf{Experimentos} \\
+    \midrule
+    Vértices $n$           & $100$ a $10\,000$          & Exps.\ 1, 2, 3 \\
+    Aristas $m$            & $200$ a $200\,000$         & Exps.\ 1, 2, 3 \\
+    Densidad $m/(n(n-1))$  & $0.02\%$ a $20\%$         & Exp.\ 3 \\
+    Peso máximo $w_{\max}$ & $1\,000$                   & Todos \\
+    Semilla base           & $42$                       & Exps.\ 1, 2, 3 \\
+    \midrule
+    Vértices $n$ (densidad)  & $500$ a $5\,000$         & Exp.\ densidad \\
+    Semillas (densidad)      & $42$, $123$, $999$       & Exp.\ densidad \\
+    Densidades (densidad)    & $m \in \{n,\,2n,\,5n,\,10n,\,\lfloor n^2/4\rfloor\}$
+                             & Exp.\ densidad \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Preprocesamiento de datos}
+
+No se aplica ningún preprocesamiento sobre los datos de entrada, ya que los
+grafos se generan directamente en la estructura de listas de adyacencia
+(\texttt{Graph::adj}) en el formato requerido por los algoritmos.
+
+Los datos de \textit{salida} (tiempos y operaciones) se exportan a archivos
+CSV sin transformación adicional. El archivo \texttt{resultados/densidad\_raw.csv}
+contiene las 60 mediciones individuales ($4$ valores de $n$ $\times$
+$5$ densidades $\times$ $3$ semillas), y
+\texttt{resultados/densidad\_promedio.csv} contiene los promedios y
+desviaciones estándar calculados directamente en C++ durante la ejecución del
+benchmark (\texttt{density\_experiment.cpp}).

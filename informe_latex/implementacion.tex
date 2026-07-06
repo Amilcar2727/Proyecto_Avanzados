@@ -1,0 +1,98 @@
+%% ============================================================
+%%  implementacion.tex  —  Sección 1.5
+%% ============================================================
+
+\subsection{Implementación del sistema}
+
+\subsubsection{Arquitectura}
+
+El sistema está organizado en módulos de cabecera (\texttt{.h}) independientes,
+compilados junto con un programa principal (\texttt{.cpp}) que orquesta la
+medición y el almacenamiento de resultados.
+La Figura~\ref{fig:arquitectura} muestra la jerarquía de dependencias.
+
+\begin{figure*}[t]
+  \centering
+  \begin{minipage}{0.85\linewidth}
+  \footnotesize
+  \begin{verbatim}
+  graph.h          <- estructura Graph, Edge, generateRandomGraph(), INF
+      |
+      +-- dijkstra.h      <- DijkstraResult dijkstra(Graph, src)
+      +-- bellman_ford.h  <- BellmanFordResult bellmanFord(Graph, src)
+      +-- thorup.h        <- ThorupResult thorup(Graph, src, maxWeight)
+      +-- det_mlogn.h     <- DetResult detMLogN(Graph, src, maxWeight)
+                    |
+                    +-- main_benchmark.cpp  (exps. 1-3, semilla 42)
+                    +-- density_experiment.cpp (exp. 4, semillas 42/123/999)
+  \end{verbatim}
+  \end{minipage}
+  \caption{Jerarquía de módulos del sistema de benchmark SSSP.}
+  \label{fig:arquitectura}
+\end{figure*}
+
+\paragraph{Estructura de datos principal: \texttt{Graph}}
+El grafo se representa mediante \textbf{listas de adyacencia}
+(\texttt{std::vector<std::vector<Edge>{}>}), donde cada arista almacena el
+vértice destino (\texttt{to}) y su peso (\texttt{weight}).
+Este formato es eficiente para grafos dispersos y es la opción estándar para
+los algoritmos de exploración iterativa evaluados.
+
+\paragraph{Tipos de retorno}
+Cada algoritmo devuelve una estructura específica que encapsula:
+\begin{itemize}
+  \item \texttt{dist}: vector de distancias mínimas desde el origen.
+  \item \texttt{opsCount}: contador de relajaciones realizadas.
+  \item Campos adicionales propios de cada algoritmo (e.g., \texttt{negativeCycle}
+    en Bellman-Ford, \texttt{numComponents} en Thorup, \texttt{levels} en DMMSY).
+\end{itemize}
+
+\subsubsection{Tecnologías utilizadas}
+
+\paragraph{C++17 — núcleo del benchmark}
+Los cuatro algoritmos y los programas de benchmark están implementados en C++17,
+compilados con \texttt{g++ -O2 -std=c++17 -Wall}.
+Se utilizan exclusivamente componentes de la STL:
+\texttt{priority\_queue}, \texttt{vector}, \texttt{deque}, \texttt{map},
+\texttt{chrono} y \texttt{random}.
+
+\paragraph{Python 3 — análisis y visualización}
+El script \texttt{plot\_density.py} lee los archivos CSV generados en C++ y
+produce cuatro gráficas PNG usando \texttt{matplotlib} (3.10.6),
+\texttt{seaborn} (0.13.2) y \texttt{pandas} (2.3.2).
+
+\paragraph{Simulador web — herramienta didáctica}
+La carpeta \texttt{web/} contiene un simulador interactivo HTML/CSS/JS
+(\texttt{index.html}, \texttt{app.js}, \texttt{style.css}) que:
+\begin{itemize}
+  \item Permite ajustar $n$ y $m$ mediante sliders en tiempo real.
+  \item Calcula operaciones teóricas usando las fórmulas:
+    $\text{Dijkstra} = (m+n)\log_2 n$,\;
+    $\text{BF} = m \cdot n$,\;
+    $\text{Det} = m\cdot(\log_2 n)^{2/3}$,\;
+    $\text{Thorup} = m+n$.
+  \item Anima la ejecución paso a paso sobre un grafo de demostración.
+  \item Genera gráficas de complejidad con \texttt{Chart.js}.
+\end{itemize}
+Este simulador \textbf{no} realiza mediciones de tiempo real: sus operaciones
+son conteos teóricos calculados en JavaScript monohilo.
+
+\paragraph{Simplificaciones documentadas}
+
+\begin{description}
+  \item[\textbf{Thorup}] La implementación usa dos niveles de cubetas (fino y
+    grueso) con ancho $\lfloor\sqrt{w_{\max}\cdot n}\rfloor$,
+    en lugar de la jerarquía completa de componentes del paper.
+    No implementa el modelo Word RAM ni opera sobre grafos no dirigidos
+    (el paper requiere grafos no dirigidos).
+    Complejidad resultante: $O(m + \sqrt{w_{\max}\cdot n})$.
+
+  \item[\textbf{DMMSY}] La implementación calcula $K = \lceil\log^{2/3}n\rceil$
+    niveles teóricos pero solo materializa el nivel~0 con ancho de cubeta
+    $w_0 = \max\!\left(1,\lfloor w_{\max}\rfloor\right) = 1$.
+    No existe promoción jerárquica entre niveles.
+    El resultado es algorítmicamente equivalente a \textbf{Dial's Algorithm
+    de un nivel}.
+    El campo \texttt{levels} del resultado devuelve $K$ como valor informativo,
+    no como niveles efectivamente utilizados.
+\end{description}

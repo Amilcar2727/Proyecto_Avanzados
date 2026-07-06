@@ -1,0 +1,90 @@
+%% ============================================================
+%%  introduccion.tex  —  Sección 1.1
+%% ============================================================
+
+\section{Experimentación}
+
+\subsection{Introducción a la experimentación}
+
+El problema de los \textit{Caminos Más Cortos desde una Fuente} (en inglés,
+\textit{Single-Source Shortest Paths}, SSSP) consiste en encontrar, dado un
+grafo dirigido ponderado $G = (V, E)$ con pesos enteros no negativos y un
+vértice origen $s \in V$, el camino de coste mínimo desde $s$ hacia cada
+vértice alcanzable del grafo.
+
+Este problema es fundamental en optimización de redes, planificación de rutas,
+sistemas de navegación y análisis de grafos sociales, entre otras
+aplicaciones. A pesar de décadas de investigación, sigue generando
+contribuciones teóricas relevantes: el año 2025 vio la publicación del primer
+algoritmo determinista que supera la barrera $O(m \log n)$ para grafos
+dirigidos con pesos enteros~\cite{duan2025}.
+
+\subsubsection*{Algoritmos analizados}
+
+Este proyecto implementa y evalúa empíricamente cuatro algoritmos SSSP:
+
+\begin{enumerate}[leftmargin=*, label=\textbf{\arabic{enumi}.}]
+
+  \item \textbf{Dijkstra con heap binario}~\cite{dijkstra1959, johnson1977}\\
+    Complejidad teórica: $O((m + n)\log n)$.
+    Utiliza una cola de prioridad mínima (min-heap) con el patrón de
+    \textit{lazy deletion}: al mejorar la distancia de un vértice se inserta
+    una nueva entrada sin eliminar la antigua; las entradas obsoletas se
+    descartan al ser extraídas.
+    \textbf{Restricción:} solo funciona con pesos no negativos.
+    Esta es la implementación estándar en la práctica para grafos dispersos.
+
+  \item \textbf{Bellman-Ford}~\cite{bellman1958, ford1956}\\
+    Complejidad teórica: $O(m \cdot n)$.
+    Realiza hasta $n-1$ pasadas de relajación sobre todas las aristas.
+    Admite pesos negativos pero \textbf{no} ciclos de peso negativo.
+    Incorpora terminación temprana: si una pasada no actualiza ninguna
+    distancia, el algoritmo concluye antes de completar las $n-1$ rondas.
+    \textbf{Restricción práctica:} en este proyecto se omite para $n > 2\,000$
+    por su coste cuadrático.
+
+  \item \textbf{Thorup — versión educativa de cubetas de 2 niveles}~\cite{thorup1999}\\
+    Complejidad teórica del paper original: $O(m + n)$ en el modelo Word RAM
+    para grafos \emph{no dirigidos}.
+    La implementación aquí presentada captura la \textit{idea central} del
+    algoritmo (jerarquía de cubetas), pero con diferencias sustanciales:
+    opera sobre grafos \emph{dirigidos}, usa $\lfloor\sqrt{w_{\max}\cdot n}\rfloor$
+    como tamaño de cubeta (en lugar de la jerarquía completa de componentes),
+    y alcanza una complejidad empírica $O(m + \sqrt{w_{\max}\cdot n})$.
+    \textbf{No constituye una implementación completa del paper.}
+
+  \item \textbf{DMMSY 2025 — versión educativa de jerarquía de un nivel}~\cite{duan2025}\\
+    Complejidad teórica del paper original: $O(m\log^{2/3} n)$ determinista
+    para grafos dirigidos con pesos enteros.
+    La implementación aquí presentada captura la idea de la jerarquía de
+    $K = \lceil\log^{2/3} n\rceil$ niveles de cubetas, pero solo implementa
+    el nivel~0 (el más granular), sin la promoción jerárquica entre niveles
+    ni las herramientas algebraicas del paper.
+    En consecuencia, degenera en un algoritmo de Dial de un nivel con ancho
+    de cubeta $w_0 = \max(1, \lfloor w_{\max}\rfloor)$.
+    \textbf{No constituye una implementación completa del paper.}
+
+\end{enumerate}
+
+\subsubsection*{Pregunta de investigación}
+
+¿Cómo afecta la densidad del grafo ($m/n$) al rendimiento relativo —en tiempo
+de ejecución y en número de operaciones de relajación— de los cuatro
+algoritmos SSSP?
+
+\subsubsection*{Hipótesis}
+
+\begin{enumerate}[label=\textbf{H\arabic{enumi}.}]
+  \item \textbf{(Dijkstra)} Dijkstra con heap binario es el más eficiente en
+    la práctica para grafos dispersos ($m = O(n)$), donde el overhead de la
+    cola de prioridad es mínimo.
+  \item \textbf{(Bellman-Ford)} Bellman-Ford es viable únicamente para $n \leq
+    500$ y se vuelve impracticable para $n > 2\,000$ a causa de su complejidad
+    cuadrática, a pesar de la terminación temprana.
+  \item \textbf{(Thorup)} La implementación educativa de Thorup presenta el
+    mayor tiempo de ejecución en todos los escenarios, debido al elevado
+    overhead constante de gestión de cubetas en memoria dinámica.
+  \item \textbf{(DMMSY)} La implementación educativa de DMMSY supera a
+    Dijkstra en grafos de muy alta densidad, donde el acceso directo a cubetas
+    reduce el coste de reordenamiento de la cola de prioridad.
+\end{enumerate}

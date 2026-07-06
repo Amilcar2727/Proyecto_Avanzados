@@ -1,0 +1,127 @@
+%% ============================================================
+%%  reproducibilidad.tex  —  Sección 1.7
+%% ============================================================
+
+\subsection{Reproducibilidad}
+
+Todos los componentes del proyecto están diseñados para ser totalmente
+reproducibles. A continuación se detallan los pasos necesarios para regenerar
+los datos, gráficas e informe desde cero.
+
+\subsubsection*{Estructura del repositorio}
+
+\begin{verbatim}
+Proyecto_Avanzados/
+(graph.h, dijkstra.h, main.cpp)
+|-- paper_1_dijkstra/src/
+(bellman_ford.h, main.cpp)
+|-- paper_2_bellman_ford/src/
+(thorup.h, main.cpp)
+|-- paper_3_thorup/src/
+(det_mlogn.h, main.cpp)
+|-- paper_4_henzinger/src/
+|-- aporte_propio/
+(todos los .h unificados + benchmarks)
+|   |-- src/
+|   |   |-- graph.h
+|   |   |-- dijkstra.h
+|   |   |-- bellman_ford.h
+|   |   |-- thorup.h
+|   |   |-- det_mlogn.h
+        (exps. 1-3)
+|   |   |-- main_benchmark.cpp
+        (exp. 4 - aporte propio)
+|   |   |-- density_experiment.cpp
+        (generador de gráficas)
+|   |   `-- plot_density.py
+|   |-- resultados/
+|   |   |-- densidad_raw.csv
+|   |   `-- densidad_promedio.csv
+(4 PNG generados por plot_density.py)
+|   |-- graficas/
+    (resultados exps. 1-3)
+|   |-- results.csv
+    (análisis textual exps. 1-3)
+|   |-- analisis.md
+    (análisis exp. 4)
+|   `-- analisis_densidad.md
+\end{verbatim}
+
+\subsubsection*{Paso 1: Compilar y ejecutar los benchmarks individuales}
+
+Desde cada carpeta \texttt{src/} individual:
+
+\begin{lstlisting}[language=bash, caption={Compilación individual de cada algoritmo.}, captionpos=b]
+# Desde paper_1_dijkstra/src/
+g++ -O2 -std=c++17 -Wall -o dijkstra_bench main.cpp
+./dijkstra_bench
+
+# Desde paper_2_bellman_ford/src/
+g++ -O2 -std=c++17 -Wall -o bellman_ford_bench main.cpp
+./bellman_ford_bench
+
+# Desde paper_3_thorup/src/
+g++ -O2 -std=c++17 -Wall -o thorup_bench main.cpp
+./thorup_bench
+
+# Desde paper_4_henzinger/src/
+g++ -O2 -std=c++17 -Wall -o dmmsy_bench main.cpp
+./dmmsy_bench
+\end{lstlisting}
+
+\subsubsection*{Paso 2: Compilar y ejecutar el benchmark unificado (Exps.\ 1–3)}
+~\\
+\begin{lstlisting}[language=bash,
+  caption={Benchmark unificado — genera \texttt{results.csv}.}, captionpos=b]
+# Desde aporte_propio/src/
+g++ -O2 -std=c++17 -Wall -o sssp_benchmark main_benchmark.cpp
+./sssp_benchmark
+# Salida: aporte_propio/results.csv
+\end{lstlisting}
+~\\
+\subsubsection*{Paso 3: Compilar y ejecutar el experimento de densidad (Exp.\ 4)}
+~\\
+\begin{lstlisting}[language=bash,
+  caption={Experimento de densidad — genera dos CSV en \texttt{resultados/}.}, captionpos=b]
+# Desde aporte_propio/src/
+g++ -O2 -std=c++17 -Wall -o density_experiment density_experiment.cpp
+./density_experiment
+# Salida:
+#   aporte_propio/resultados/densidad_raw.csv
+#   aporte_propio/resultados/densidad_promedio.csv
+\end{lstlisting}
+
+El programa imprime progreso en consola para cada configuración
+$(n, \text{densidad})$ e indica las rutas de los archivos generados al
+finalizar.
+~\\
+\subsubsection*{Paso 4: Generar las gráficas}
+~\\
+\begin{lstlisting}[language=bash,
+  caption={Generación de gráficas PNG.}, captionpos=b]
+# Requiere: pip install matplotlib pandas seaborn
+# Desde aporte_propio/src/
+python plot_density.py
+# Salida: aporte_propio/graficas/*.png (4 archivos)
+\end{lstlisting}
+~\\
+
+\subsubsection*{Factores que pueden afectar la reproducibilidad}
+
+\begin{itemize}
+  \item \textbf{Semillas:} Los experimentos 1–3 usan la semilla fija $42$.
+    El Experimento~4 usa las semillas $\{42, 123, 999\}$.
+    Cambiar la semilla altera los grafos generados y por tanto los tiempos,
+    aunque el número de aristas y la densidad se mantienen en el rango
+    objetivo.
+  \item \textbf{Versión del compilador:} El uso de \texttt{-O2} activa
+    optimizaciones dependientes del compilador. Diferentes versiones de
+    \texttt{g++} pueden generar código con tiempos distintos.
+  \item \textbf{Carga del sistema:} Los tiempos en microsegundos son
+    sensibles a la carga del sistema operativo durante la medición. Se
+    recomienda ejecutar los benchmarks con carga mínima de procesos en
+    segundo plano.
+  \item \textbf{Arquitectura del procesador:} Las implementaciones no usan
+    instrucciones SIMD ni paralelismo; sin embargo, la jerarquía de caché
+    del procesador influye en los tiempos reales.
+\end{itemize}

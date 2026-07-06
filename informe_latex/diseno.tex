@@ -1,0 +1,128 @@
+%% ============================================================
+%%  diseno.tex  —  Sección 1.4
+%% ============================================================
+
+\subsection{Diseño experimental}
+
+\subsubsection{Objetivo experimental}
+
+El objetivo central es cuantificar empíricamente el impacto de dos variables
+de diseño — el número de vértices $n$ y la densidad del grafo $m/n$ — sobre
+el rendimiento de los cuatro algoritmos SSSP implementados.
+Se pretende:
+
+\begin{itemize}
+  \item Verificar si el crecimiento del tiempo de ejecución es consistente
+    con las complejidades teóricas declaradas.
+  \item Determinar en qué regiones del espacio $(n, m)$ cada algoritmo
+    presenta ventajas prácticas sobre los demás.
+  \item Cuantificar el overhead de las implementaciones educativas de Thorup
+    y DMMSY frente a las implementaciones canónicas de Dijkstra y Bellman-Ford.
+  \item Establecer condiciones de densidad bajo las cuales la terminación
+    temprana de Bellman-Ford permite competir con Dijkstra.
+\end{itemize}
+
+\subsubsection{Métricas de evaluación}
+
+Se recopilan dos métricas para cada ejecución:
+
+\begin{enumerate}
+  \item \textbf{Tiempo de ejecución} ($t$, en microsegundos $\mu$s):
+    medido mediante \lstinline{std::chrono::high_resolution_clock} con
+    granularidad de al menos $1\,\mu$s en el sistema empleado. Incluye
+    exclusivamente el tiempo de la llamada al algoritmo, no la generación
+    del grafo ni la escritura al CSV.
+
+  \item \textbf{Número de operaciones de relajación} (ops):
+    contador interno de cada algoritmo que incrementa en $1$ cada vez
+    que se examina una arista $(u, v)$ para intentar mejorar
+    $\textit{dist}[v]$. Esta métrica es independiente del hardware y
+    permite comparar el comportamiento algorítmico puro.
+\end{enumerate}
+
+\noindent En el experimento de densidad se calcula además la \textbf{media}
+y la \textbf{desviación estándar} de ambas métricas sobre las 3 semillas,
+y se identifica el \textbf{algoritmo ganador} (menor tiempo promedio) para
+cada configuración $(n, \textit{densidad})$.
+
+\subsubsection{Escenarios de prueba}
+
+El proyecto contempla cuatro grupos de experimentos:
+
+\paragraph{Experimento 1 — Escalabilidad en $n$ (densidad dispersa)}
+Semilla fija $= 42$. Se varía $n \in \{100, 500, 1\,000, 2\,000, 5\,000,
+10\,000\}$ manteniendo $m = 2n$. El objetivo es observar el crecimiento de
+los tiempos con el número de vértices bajo condiciones dispersas.
+
+\paragraph{Experimento 2 — Escalabilidad en $m$ ($n$ fijo)}
+$n = 1\,000$ fijo, semilla $= 42$. Se varía $m \in \{1\,000,\, 5\,000,\,
+10\,000,\, 50\,000,\, 100\,000,\, 200\,000\}$. El objetivo es aislar el
+efecto del número de aristas sobre cada algoritmo.
+
+\paragraph{Experimento 3 — Comparación de densidades ($n = 500$ fijo)}
+Semilla $= 42$. Se varía la densidad relativa del grafo seleccionando
+$m \in \{500,\, 2\,500,\, 12\,500,\, 50\,000\}$, correspondientes a las
+etiquetas \textit{muy disperso}, \textit{disperso}, \textit{medio} y
+\textit{denso}.
+
+\paragraph{Experimento 4 — Aporte propio: impacto sistemático de la densidad}
+Diseño factorial cruzado. Se evalúan $4 \times 5 = 20$ configuraciones
+$(n, \textit{nivel\_densidad})$ replicadas con $3$ semillas distintas
+($42, 123, 999$), dando un total de $60$ mediciones brutas.
+Los niveles de densidad y sus valores de $m_{\text{target}}$ son:
+
+\begin{table}[H]
+  \centering
+  \caption{Niveles de densidad del Experimento~4 (aporte propio).}
+  \label{tab:densidades}
+  \begin{tabular}{l p{2cm} p{4cm}}
+    \toprule
+    \textbf{Etiqueta} & \textbf{$m_{\text{target}}$} & \textbf{Descripción} \\
+    \midrule
+    \texttt{muy\_disperso} & $n$             & Un árbol de expansión dirigido \\
+    \texttt{disperso}      & $2n$            & Baja densidad, estándar bibliográfico \\
+    \texttt{semi\_denso}   & $5n$            & Densidad intermedia baja \\
+    \texttt{denso}         & $10n$           & Densidad intermedia alta \\
+    % Separamos la ecuación en dos partes abriendo y cerrando $ $ en la coma:
+    \texttt{muy\_denso}    & $\min(n(n-1),$ $\lfloor n^2/4\rfloor)$
+                           & Grafo cuasi-completo \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Comparación con trabajos relacionados}
+
+La Tabla~\ref{tab:complejidades_proyecto} resume las complejidades teóricas de los
+cuatro algoritmos y los compara con sus implementaciones en este proyecto.
+
+\begin{table*}[t]
+  \centering
+  \caption{Complejidades teóricas vs.\ implementación en el proyecto.}
+  \label{tab:complejidades_proyecto}
+  \begin{tabular}{p{3cm} p{3.2cm} p{3.2cm} l}
+    \toprule
+    \textbf{Algoritmo} & \textbf{Complejidad teórica} &
+    \textbf{Implementación} & \textbf{Tipo} \\
+    \midrule
+    Dijkstra \cite{dijkstra1959} &
+      $O((m+n)\log n)$ &
+      $O((m+n)\log n)$ & Completa \\[4pt]
+    Bellman-Ford \cite{bellman1958} &
+      $O(m \cdot n)$ &
+      $O(m \cdot n)$ & Completa \\[4pt]
+    Thorup \cite{thorup1999} &
+      $O(m+n)$ (Word RAM, no dirigido) &
+      $O(m+\sqrt{w_{\max}\cdot n})$ & \textbf{Educativa} \\[4pt]
+    DMMSY \cite{duan2025} &
+      $O(m\log^{2/3}n)$ (dirigido) &
+      $O(m + D/w_0)$ (1 nivel) & \textbf{Educativa} \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+Las implementaciones de Dijkstra y Bellman-Ford reproducen fielmente sus
+complejidades teóricas. Las implementaciones de Thorup y DMMSY son versiones
+educativas que capturan la \textit{idea central} de cada algoritmo pero
+divergen de las descripciones de los papers en cuanto a la estructura de
+jerarquía, el modelo de cómputo (Word RAM) y las herramientas algebraicas.
+Los resultados empíricos deben interpretarse bajo esta limitación.

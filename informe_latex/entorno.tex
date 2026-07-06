@@ -1,0 +1,71 @@
+%% ============================================================
+%%  entorno.tex  —  Sección 1.2
+%% ============================================================
+
+\subsection{Entorno experimental}
+
+\subsubsection{Hardware}
+
+Los experimentos se ejecutaron en el equipo local del equipo de desarrollo
+bajo el sistema operativo \textbf{Windows} (versión detectada durante la
+ejecución de los benchmarks compilados con MinGW/MSYS2).
+
+\begin{table*}[t]
+  \centering
+  \caption{Especificaciones de hardware del entorno experimental.}
+  \label{tab:hardware}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Componente} & \textbf{Especificación} \\
+    \midrule
+    Procesador     & \texttt{Intel(R) Core(TM) i5-1035G1} \\
+    Frecuencia     & \texttt{CPU @ 1.00GHz base} \\
+    Núcleos / Hilos & \texttt{Cores: 4, LogicalProcessors: 8, MaxClockSpeed: 1190} \\
+    Memoria RAM    & \texttt{16\,GB (16553776Kb)} \\
+    Almacenamiento & \texttt{Model: KINGSTON SNV2S500G, Size: 500105249280} \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+Los benchmarks se ejecutan de forma \textbf{monohilo} (proceso único sin
+paralelismo explícito). La medición de tiempo utiliza
+\lstinline{std::chrono::high_resolution_clock} de la biblioteca estándar de
+C++, lo que introduce una resolución típica de microsegundos en plataformas
+Windows modernas.
+
+\subsubsection{Software}
+
+\begin{table*}[t]
+  \centering
+  \caption{Software utilizado en el proyecto.}
+  \label{tab:software}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Componente} & \textbf{Herramienta} & \textbf{Versión} \\
+    \midrule
+    Compilador C++ & \texttt{g++} (MinGW-w64 / MSYS2) &
+      \texttt{14.2.0} \\
+    Estándar C++   & C++17 & — \\
+    Flags de compilación & \texttt{-O2 -std=c++17 -Wall} & — \\
+    Python         & CPython & 3.13\footnotemark \\
+    Biblioteca \texttt{pandas}   & pandas  & 2.3.2 \\
+    Biblioteca \texttt{matplotlib} & matplotlib & 3.10.6 \\
+    Biblioteca \texttt{seaborn}  & seaborn & 0.13.2 \\
+    Control de versiones & Git & \texttt{git version 2.43.0.windows.1} \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\footnotetext{Versión inferida de la ruta de instalación
+\texttt{C:\textbackslash{}Users\textbackslash{}...\textbackslash{}Python313}
+observada durante la instalación de dependencias.}
+
+Las versiones de \texttt{pandas}, \texttt{matplotlib} y \texttt{seaborn}
+fueron registradas automáticamente durante la ejecución de
+\texttt{pip install} en el entorno del equipo de desarrollo.
+
+Las optimizaciones del compilador (\texttt{-O2}) se aplicaron en todos los
+experimentos para reproducir condiciones de compilación representativas del
+software de producción, evitando artificios de código no optimizado.
+La bandera \texttt{-Wall} se utilizó para capturar advertencias del
+compilador sin suprimir ninguna.
