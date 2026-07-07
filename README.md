@@ -1,6 +1,36 @@
 # Algoritmos-Avanzados-SSSP
 ## Comparativa Experimental de Algoritmos de Caminos Más Cortos desde una Fuente (SSSP)
+Implementación y evaluación experimental de cuatro algoritmos para el problema **Single-Source Shortest Paths (SSSP)** sobre grafos dirigidos con pesos enteros positivos.
+
+El proyecto compara:
+
+- Dijkstra
+- Bellman-Ford
+- Thorup (implementación educativa)
+- DMMSY 2025 (implementación educativa)
+
+Se realizaron cuatro experimentos para analizar el efecto del tamaño del grafo y su densidad sobre el rendimiento práctico de cada algoritmo.
+
+El repositorio incluye:
+
+- Implementaciones independientes de cada algoritmo
+- Benchmark unificado
+- Scripts para generar gráficas
+- Resultados reproducibles
+- Análisis experimental
 ---
+
+## Tabla de Contenido
+
+- Objetivo
+- Algoritmos Comparados
+- Estructura del Proyecto
+- Experimentos
+- Compilación
+- Resultados
+- Reproducibilidad
+- Limitaciones
+- Autores
 
 ## Objetivo del Proyecto
 
