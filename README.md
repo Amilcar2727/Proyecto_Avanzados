@@ -34,7 +34,7 @@ El repositorio incluye:
 
 ## Objetivo del Proyecto
 
-Este repositorio contiene el análisis comparativo de **cuatro algoritmos clásicos y modernos** para el problema *Single-Source Shortest Paths* (SSSP) en grafos dirigidos con pesos enteros no negativos. El objetivo es estudiar el comportamiento empírico de cada algoritmo en función del tamaño del grafo (`n`) y su densidad (`m/n`), contrastando los tiempos reales con las complejidades teóricas.
+Este repositorio contiene el análisis de el comparativo de **cuatro algoritmos clásicos y modernos** para el problema *Single-Source Shortest Paths* (SSSP) en grafos dirigidos con pesos enteros no negativos. El objetivo es estudiar el comportamiento empírico de cada algoritmo en función del tamaño del grafo (`n`) y su densidad (`m/n`), contrastando los tiempos reales con las complejidades teóricas.
 
 ---
 
