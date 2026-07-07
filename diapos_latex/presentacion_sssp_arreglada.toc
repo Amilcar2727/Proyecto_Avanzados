@@ -1,8 +1,0 @@
-\babel@toc {spanish}{}\relax 
-\beamer@sectionintoc {1}{Introducción y Motivación}{3}{0}{1}
-\beamer@sectionintoc {2}{Entorno y Metodología Experimental}{6}{0}{2}
-\beamer@sectionintoc {3}{Resultados: Experimentos 1--3}{9}{0}{3}
-\beamer@sectionintoc {4}{Resultados: Experimento 4 (Aporte Propio)}{13}{0}{4}
-\beamer@sectionintoc {5}{Verificación de Hipótesis}{21}{0}{5}
-\beamer@sectionintoc {6}{Fundamentos Teóricos: El Algoritmo DMMSY}{22}{0}{6}
-\beamer@sectionintoc {7}{Conclusiones y Trabajo Futuro}{24}{0}{7}
