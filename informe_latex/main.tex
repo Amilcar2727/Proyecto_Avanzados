@@ -18,6 +18,8 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \lstset{
   basicstyle=\ttfamily\scriptsize,
@@ -42,28 +44,32 @@
     \textbf{José Manuel Bustinza Quispe}\\
     {\small Ingeniería Informática y de Sistemas}\\
     {\small UNSAAC}\\
-    {\small 224867@unsaac.edu.pe}
+    {\small 224867@unsaac.edu.pe}\\
+    {\small ORCID: 0009-0004-2543-884X}
   \end{minipage}
   &
   \begin{minipage}[t]{0.35\textwidth}\centering
     \textbf{Brenda Lucía Mayhuire Chacón}\\
     {\small Ingeniería Informática y de Sistemas}\\
     {\small UNSAAC}\\
-    {\small 231445@unsaac.edu.pe}
+    {\small 231445@unsaac.edu.pe}\\
+    {\small ORCID: 0009-0006-3406-3773}
   \end{minipage}
-  \\[4em]
+  \\[6em]
   \begin{minipage}[t]{0.35\textwidth}\centering
     \textbf{Amilcar Estacio Medrano}\\
     {\small Ingeniería Informática y de Sistemas}\\
     {\small UNSAAC}\\
-    {\small 200822@unsaac.edu.pe}
+    {\small 200822@unsaac.edu.pe}\\
+    {\small ORCID: 0009-0004-9591-0505}
   \end{minipage}
   &
   \begin{minipage}[t]{0.35\textwidth}\centering
     \textbf{Mirco Sair Salcedo Ataulluco}\\
     {\small Ingeniería Informática y de Sistemas}\\
     {\small UNSAAC}\\
-    {\small 200886@unsaac.edu.pe}
+    {\small 200886@unsaac.edu.pe}\\
+    {\small ORCID: 0009-0007-6938-7214}
   \end{minipage}
 \end{tabular}%
 }
@@ -107,7 +113,7 @@ El algoritmo de Dijkstra \cite{dijkstra1959} estableció las bases del estudio d
 
 \subsection{Mejoras Basadas en Estructuras de Datos}
 
-Un avance decisivo en la eficiencia del algoritmo de Dijkstra fue la introducción de los montículos de Fibonacci por Fredman y Tarjan \cite{fredman1987}, los cuales permitieron reducir el costo amortizado de las operaciones de actualización de prioridad y alcanzar la complejidad teórica de $O(m + n \log n)$. Posteriormente, Thorup \cite{thorup1999} demostró que, en grafos no dirigidos con pesos enteros, era posible resolver el problema SSSP en tiempo lineal $O(m)$, un resultado considerado óptimo bajo dichas restricciones. Pettie y Ramachandran \cite{pettie2002} extendieron estas ideas a grafos no dirigidos con pesos reales, ofreciendo algoritmos más eficientes en escenarios específicos.
+Un avance decisivo en la eficiencia del algoritmo de Dijkstra fue la introducción de los montículos de Fibonacci por Fredman y Tarjan \cite{fredman1987}, los cuales permitieron reducir el costo amortizado de las operaciones de actualización de prioridad y alcanzar la complejidad teórica de $O(m + n \log n)$. Posteriormente, Thorup \cite{thorup1999} demostró que, en grafos no dirigidos con pesos enteros, era posible resolver el problema SSSP en tiempo lineal $O(m)$, un resultado considerado óptimo bajo dichas restricciones. Pettie y Ramachandran \cite{pettie2002} extendieron estas ideas a grafos no dirigidos con pesos reales, ofreciendo algoritmos más eficientes en escenarios específicos. Estudios recientes han retomado esta discusión desde una perspectiva empírica, comparando el rendimiento práctico de distintas variantes de cola de prioridad en Dijkstra \cite{costa2025, lewis2023, idowu2025}, reforzando la brecha entre complejidad teórica y eficiencia real que este trabajo también documenta.
 
 \subsection{Técnicas de Escalado y Aproximación}
 
@@ -229,139 +235,77 @@ Los experimentos se ejecutaron de manera monohilo (proceso único sin paralelism
 
 \subsection{Flujo y Pseudocódigo}
 
-El flujo operativo de las implementaciones se estructuró de manera homogénea. El pseudocódigo detallado en el Algoritmo~\ref{alg:dijkstra} ilustra la lógica de la implementación de Dijkstra, la cual actúa como la línea base del benchmark.
+El flujo operativo de las implementaciones se estructuró de manera homogénea. El pseudocódigo detallado en el Algoritmo~\ref{alg:dijkstra} ilustra la lógica de Dijkstra, línea base del benchmark.
 
-\begin{lstlisting}[language=C++, caption={Algoritmo de Dijkstra con eliminación perezosa (lazy deletion).}, label={alg:dijkstra}]
-DijkstraResult dijkstra(const Graph& g, int src) {
-    std::vector<long long> dist(g.n, INF);
-    std::priority_queue<std::pair<long long, int>, 
-                        std::vector<std::pair<long long, int>>, 
-                        std::greater<>> pq;
-    dist[src] = 0;
-    pq.push({0, src});
-    long long ops = 0;
-    while (!pq.empty()) {
-        auto [d, u] = pq.top(); pq.pop();
-        if (d > dist[u]) continue; 
-        for (const Edge& e : g.adj[u]) {
-            ++ops;
-            long long nd = dist[u] + e.weight;
-            if (nd < dist[e.to]) {
-                dist[e.to] = nd;
-                pq.push({nd, e.to});
-            }
-        }
-    }
-    return {dist, ops};
-}
-\end{lstlisting}
+\begin{algorithm}[H]
+\caption{Dijkstra con eliminación perezosa.}
+\label{alg:dijkstra}
+\begin{algorithmic}[1]
+\Require Grafo $G=(V,E)$, vértice origen $s$
+\Ensure Vector de distancias $dist$, contador $ops$
+\State $dist[v] \gets \infty$ para todo $v \in V$; \; $dist[s] \gets 0$
+\State $ops \gets 0$
+\State Insertar $(0, s)$ en cola de prioridad mínima $Q$
+\While{$Q \neq \emptyset$}
+    \State $(d, u) \gets$ extraer mínimo de $Q$
+    \If{$d > dist[u]$} \textbf{continuar} \EndIf
+    \For{cada arista $(u, v, w) \in E$}
+        \State $ops \gets ops + 1$
+        \If{$dist[u] + w < dist[v]$}
+            \State $dist[v] \gets dist[u] + w$
+            \State Insertar $(dist[v], v)$ en $Q$
+        \EndIf
+    \EndFor
+\EndWhile
+\State \Return $dist$, $ops$
+\end{algorithmic}
+\end{algorithm}
 
-El Algoritmo~\ref{alg:bellman_ford} detalla la estructura lógica de Bellman-Ford con la bandera de terminación temprana que permitió optimizar la convergencia en densidades medias.
+El Algoritmo~\ref{alg:bellman_ford} detalla la estructura de Bellman-Ford con terminación temprana.
 
-\begin{lstlisting}[language=C++, caption={Algoritmo de Bellman-Ford con terminación temprana.}, label={alg:bellman_ford}]
-BellmanFordResult bellmanFord(const Graph& g, int src) {
-    std::vector<long long> dist(g.n, INF);
-    dist[src] = 0;
-    long long ops = 0;
-    bool negativeCycle = false;
-    for (int iter = 0; iter < g.n - 1; ++iter) {
-        bool updated = false;
-        for (int u = 0; u < g.n; ++u) {
-            if (dist[u] == INF) continue;
-            for (const Edge& e : g.adj[u]) {
-                ++ops;
-                long long nd = dist[u] + e.weight;
-                if (nd < dist[e.to]) {
-                    dist[e.to] = nd;
-                    updated = true;
-                }
-            }
-        }
-        if (!updated) break; 
-    }
-    for (int u = 0; u < g.n; ++u) {
-        if (dist[u] == INF) continue;
-        for (const Edge& e : g.adj[u]) {
-            if (dist[u] + e.weight < dist[e.to]) {
-                negativeCycle = true;
-                break;
-            }
-        }
-        if (negativeCycle) break;
-    }
-    return {dist, ops, negativeCycle};
-}
-\end{lstlisting}
+\begin{algorithm}[H]
+\caption{Bellman-Ford con terminación temprana.}
+\label{alg:bellman_ford}
+\begin{algorithmic}[1]
+\Require Grafo $G=(V,E)$, vértice origen $s$
+\Ensure Vector de distancias $dist$, $ops$, bandera $cicloNeg$
+\State $dist[v] \gets \infty$ para todo $v \in V$; \; $dist[s] \gets 0$
+\State $ops \gets 0$; \; $cicloNeg \gets$ \textbf{falso}
+\For{$iter = 1$ \textbf{hasta} $|V|-1$}
+    \State $actualizado \gets$ \textbf{falso}
+    \For{cada vértice $u \in V$ con $dist[u] \neq \infty$}
+        \For{cada arista $(u, v, w) \in E$}
+            \State $ops \gets ops + 1$
+            \If{$dist[u] + w < dist[v]$}
+                \State $dist[v] \gets dist[u] + w$
+                \State $actualizado \gets$ \textbf{verdadero}
+            \EndIf
+        \EndFor
+    \EndFor
+    \If{$\neg\, actualizado$} \textbf{salir del bucle} \EndIf
+\EndFor
+\State Verificar ciclo negativo con una pasada adicional
+\State \Return $dist$, $ops$, $cicloNeg$
+\end{algorithmic}
+\end{algorithm}
 
 \section{Implementación}
 
-La arquitectura del sistema se organizó en módulos de cabecera independientes para cada algoritmo, compilados de forma conjunta con los programas de orquestación experimental.
+La arquitectura del sistema se organizó en módulos de cabecera (\textit{header-only}) independientes para cada algoritmo, compilados de forma conjunta con los programas de orquestación experimental. El proyecto se estructuró en cinco carpetas principales: cuatro carpetas individuales (\texttt{paper\_1\_dijkstra}, \texttt{paper\_2\_bellman\_ford}, \texttt{paper\_3\_thorup} y \texttt{paper\_4\_henzinger}), cada una conteniendo la cabecera del algoritmo correspondiente y un programa principal de prueba, más una carpeta \texttt{aporte\_propio} que unifica las cuatro implementaciones algorítmicas junto con la representación del grafo, los programas de benchmark y el script de generación de gráficas en Python.
 
-La estructura y organización de carpetas del repositorio se detalló en el siguiente diagrama de distribución modular:
-\begin{figure}[H]
-  \centering
-  \begin{minipage}{\linewidth}
-  \footnotesize
-  \begin{verbatim}
-  Proyecto_Avanzados/
-  |-- paper_1_dijkstra/src/        <- dijkstra.h, main.cpp
-  |-- paper_2_bellman_ford/src/    <- bellman_ford.h, main.cpp
-  |-- paper_3_thorup/src/          <- thorup.h, main.cpp
-  |-- paper_4_henzinger/src/       <- det_mlogn.h, main.cpp
-  `-- aporte_propio/
-      |-- src/
-      |   |-- graph.h              <- Lista de adyacencia
-      |   |-- dijkstra.h
-      |   |-- bellman_ford.h
-      |   |-- thorup.h
-      |   |-- det_mlogn.h
-      |   |-- main_benchmark.cpp   <- Exps. 1-3 unificados
-      |   |-- density_experiment.cpp <- Exp. 4 factorial
-      |   `-- plot_density.py      <- Generador de graficas
-      |-- resultados/              <- raw.csv, promedio.csv
-      `-- graficas/                <- PNGs resultantes
-  \end{verbatim}
-  \end{minipage}
-  \caption{Arquitectura física y estructura de carpetas del proyecto.}
-  \label{fig:estructura_carpetas}
-\end{figure}
+El grafo se representó mediante una lista de adyacencia utilizando vectores dinámicos anidados, donde cada arista almacena el vértice destino y el peso. Cada función algorítmica retornó una estructura conteniendo el vector de distancias mínimas y un contador del total de operaciones de relajación ejecutadas.
 
-El grafo se representó a nivel de software mediante una lista de adyacencia basada en la plantilla de contenedor secuencial dinámico: \lstinline{std::vector<std::vector<Edge>>}, donde el tipo estructurado \texttt{Edge} contiene los campos miembro enteros \texttt{to} (vértice destino) y \texttt{weight} (peso de la arista). El uso de este contenedor dinámico minimizó el direccionamiento indirecto en memoria y optimizó los saltos en los bucles de relajación. Cada función algorítmica retornó una estructura particular (como \texttt{DijkstraResult} o \texttt{DetResult}) conteniendo el vector de distancias mínimas calculadas y un contador entero del total de operaciones de relajación ejecutadas.
-
-\subsection{Simplificaciones Documentadas}
-
-Para las implementaciones avanzadas se adoptaron versiones educativas simplificadas:
-\begin{itemize}
-    \item \textbf{Thorup}: Se implementó un esquema de cubetas en dos niveles (fino de ancho $1$ y grueso de ancho $\lfloor\sqrt{w_{\max}\cdot n}\rfloor$) que captura el concepto de procesamiento jerárquico sin la sobrecarga del árbol de componentes completo. Se omitió la aritmética de bits de Word RAM y se operó directamente sobre grafos dirigidos, obteniendo una complejidad de $O(m + \sqrt{w_{\max}\cdot n})$.
-    \item \textbf{DMMSY}: Se implementó el cálculo del número de niveles jerárquicos teóricos $K = \lceil\log^{2/3}n\rceil$, pero se materializó exclusivamente el nivel más fino (nivel 0) con ancho $w_0 = 1$. Se omitió la promoción y las estructuras algebraicas avanzadas, operando de forma análoga al algoritmo clásico de Dial de un nivel, con complejidad empírica de $O(m + D/w_0)$.
-\end{itemize}
+Para las implementaciones avanzadas se adoptaron versiones educativas simplificadas. En el caso de \textbf{Thorup}, se implementó un esquema de cubetas en dos niveles (fino de ancho $1$ y grueso de ancho $\lfloor\sqrt{w_{\max}\cdot n}\rfloor$), omitiendo la aritmética de bits de Word RAM y operando directamente sobre grafos dirigidos, con complejidad $O(m + \sqrt{w_{\max}\cdot n})$. Para \textbf{DMMSY}, se calculó el número de niveles jerárquicos teóricos $K = \lceil\log^{2/3}n\rceil$, pero se materializó únicamente el nivel más fino con ancho $w_0=1$, operando de forma análoga al algoritmo de Dial con complejidad $O(m + D/w_0)$.
 
 \section{Repositorio GitHub}
 
-Los archivos del proyecto, incluyendo el historial completo de control de cambios, se publicaron y mantuvieron de forma colaborativa en la plataforma GitHub bajo el enlace oficial:
+Todo el código fuente, los datos experimentales y el historial completo de control de cambios se publicaron de forma colaborativa en un repositorio público de GitHub. El enlace oficial del repositorio es:
+
 \begin{center}
     \url{https://github.com/Amilcar2727/Proyecto_Avanzados}
 \end{center}
 
-El historial de commits del repositorio evidenció un trabajo colaborativo continuo y distribuido de forma equitativa entre los cuatro integrantes del grupo. Los cambios documentaron tareas específicas, como la integración de los contadores de operaciones en las cabeceras, la corrección de tipos de datos para prevenir desbordamientos aritméticos en la suma de distancias infinitas (\lstinline{long long}), y el desarrollo de scripts de visualización.
-
-El README ubicado en la raíz del repositorio provee una guía detallada con los prerrequisitos de instalación, dependencias y las instrucciones completas para reproducir localmente las ejecuciones. Las dependencias lógicas necesarias se listaron en la Tabla~\ref{tab:software}. El proceso de compilación y ejecución se detalló en el script de consola presentado en la sección de código~\ref{lst:run_commands}.
-
-\begin{lstlisting}[language=bash, caption={Pasos para clonar, compilar y ejecutar el benchmark.}, label={lst:run_commands}]
-# 1. Clonar el repositorio
-git clone https://github.com/Amilcar2727/Proyecto_Avanzados.git
-cd Proyecto_Avanzados/aporte_propio/src/
-
-# 2. Compilar el experimento factorial de densidad
-g++ -O2 -std=c++17 -Wall -o density_experiment density_experiment.cpp
-
-# 3. Ejecutar el benchmark unificado
-./density_experiment
-
-# 4. Generar las graficas PNG usando Python 3
-pip install pandas matplotlib seaborn
-python plot_density.py
-\end{lstlisting}
+El historial de commits evidenció un trabajo colaborativo continuo y distribuido entre los cuatro integrantes del grupo. El repositorio contiene un archivo \texttt{README.md} detallado en la raíz del proyecto que documenta los prerrequisitos de instalación, las dependencias necesarias (compilador \texttt{g++} con soporte C++17, Python~3 con las bibliotecas \texttt{pandas}, \texttt{matplotlib} y \texttt{seaborn}) y las instrucciones paso a paso para clonar, compilar y ejecutar los benchmarks, así como para generar las gráficas de resultados. Las versiones específicas del software utilizado se listaron en la Tabla~\ref{tab:software}.
 
 \section{Experimentación}
 
@@ -564,29 +508,17 @@ La Fig.~\ref{fig:g4_scaling} y la Tabla~\ref{tab:scaling_data} resumen la escala
 
 \section{Discusión de Resultados}
 
-El análisis comparativo de los resultados experimentales revela comportamientos divergentes entre las complejidades teóricas asintóticas y el rendimiento real de los algoritmos en hardware moderno. Esta discrepancia es el resultado directo de constantes ocultas, la gestión de memoria y la interacción con la jerarquía de caché.
+El análisis comparativo revela comportamientos divergentes entre las complejidades teóricas asintóticas y el rendimiento real en hardware moderno, debido a constantes ocultas, gestión de memoria e interacción con la jerarquía de caché.
 
-\subsection{Rendimiento de los Algoritmos}
+\textbf{Dijkstra} demuestra alta eficiencia en grafos muy dispersos ($m \approx n$), donde el número de inserciones en la cola de prioridad es mínimo y el factor $O(\log n)$ resulta insignificante. En alta densidad, la reestructuración continua del montículo degrada su rendimiento. Su crecimiento temporal al escalar $n$ (Fig.~\ref{fig:g4_scaling}) es sublineal frente a la referencia $O(n\log n)$, reflejando la buena localidad de caché de los montículos en arreglos.
 
-\subsubsection{Dijkstra con Montículo Binario}
-Dijkstra demuestra una alta eficiencia en grafos muy dispersos ($m \approx n$). En esta región (columna \texttt{muy\_disperso} de la Fig.~\ref{fig:g3_heatmap}), el número de inserciones en la cola de prioridad es mínimo y el factor logarítmico de ordenamiento $O(\log n)$ representa un costo insignificante. Sin embargo, en grafos de alta densidad, la inserción continua de múltiples aristas incrementa el tamaño de la cola, lo que eleva el costo de reestructuración del montículo y degrada su rendimiento relativo. Un aspecto relevante es que el crecimiento de su tiempo al escalar $n$ (Fig.~\ref{fig:g4_scaling}) es sublineal frente a la referencia teórica $O(n\log n)$, lo cual refleja la excelente localidad de datos en caché que proporciona la representación secuencial de montículos en arreglos para tamaños medianos.
+\textbf{Bellman-Ford} domina en densidades intermedias para $n \leq 2\,000$ (Fig.~\ref{fig:g3_heatmap}). Aunque posee complejidad $O(m \cdot n)$, la terminación temprana permite convergencia en pocas iteraciones (típicamente $<10$) en grafos aleatorios con pesos acotados en $[1, 1000]$. Al no requerir cola de prioridad, sus constantes ocultas son extremadamente bajas. Sin embargo, para $n \geq 5\,000$ la sobrecarga de recorrer $m$ aristas por ronda vuelve a superar a Dijkstra (Tabla~\ref{tab:scaling_data}).
 
-\subsubsection{Bellman-Ford con Terminación Temprana}
-La mayor sorpresa del estudio corresponde al dominio de Bellman-Ford en densidades intermedias (\texttt{disperso} a \texttt{denso} en la Fig.~\ref{fig:g3_heatmap}) para grafos con $n \leq 2\,000$. Teóricamente, Bellman-Ford posee una complejidad cuadrática $O(m \cdot n)$, la cual resulta impracticable en grafos de gran tamaño. No obstante, al implementar la optimización de terminación temprana, el algoritmo detiene su ejecución inmediatamente si en una iteración no ocurre ninguna relajación. En grafos aleatorios dirigidos sin ciclos de peso negativo y pesos acotados en $[1, 1000]$, la distancia promedio (en número de aristas) desde la fuente hasta todos los vértices alcanzables es extremadamente pequeña. Como consecuencia, el algoritmo converge en muy pocas iteraciones (típicamente menos de 10), mucho antes del límite teórico de $n-1$ rondas. Dado que Bellman-Ford no requiere de ninguna estructura de cola de prioridad ni ordenación (recorriendo linealmente los vectores), sus constantes ocultas son extremadamente bajas. En densidades medias, esta simplicidad y rápida convergencia le permiten superar a Dijkstra, el cual sufre por el mantenimiento del montículo. Sin embargo, para $n \geq 5\,000$, la sobrecarga de recorrer el volumen de aristas $m$ en cada ronda, incluso en pocas iteraciones, vuelve a superar el tiempo de Dijkstra (ver Tabla~\ref{tab:scaling_data}).
+\textbf{DMMSY} (equivalente al algoritmo de Dial) resulta ganador en muy alta densidad para $n \geq 2\,000$. Al usar cubetas indexables directamente por distancia tentativa, inserta y extrae en $O(1)$, eliminando la barrera logarítmica de Dijkstra.
 
-\subsubsection{DMMSY (Versión Educativa de un Nivel)}
-La versión simplificada de DMMSY, equivalente a la estructura de un nivel del algoritmo de Dial con ancho de cubeta $w_0=1$, resulta ganadora en el escenario de muy alta densidad y tamaños de grafo grandes ($n \geq 2\,000$, columna \texttt{muy\_denso} de la Fig.~\ref{fig:g3_heatmap}). Al utilizar un arreglo de cubetas indexables directamente mediante la distancia tentativa ($slot = dist[u] / w_0$), el algoritmo inserta y extrae elementos en tiempo constante $O(1)$, eliminando por completo la barrera del ordenamiento logarítmico de Dijkstra. En grafos de alta densidad, el volumen de aristas es lo suficientemente grande como para compensar la sobrecarga de iterar secuencialmente sobre cubetas vacías. Este resultado valida empíricamente la hipótesis teórica de que evitar el ordenamiento global produce beneficios prácticos significativos en presencia de grafos densos.
+\textbf{Thorup} es consistentemente el más lento debido al elevado costo de gestión de memoria dinámica en sus cubetas jerárquicas, que destruye la localidad de caché.
 
-\subsubsection{Thorup (Versión Educativa de dos Niveles)}
-A pesar de su óptima complejidad teórica lineal en el modelo Word RAM, la implementación simplificada de Thorup es consistentemente la más lenta de todas las evaluadas. Esto ocurre por el elevado costo constante derivado de la gestión de memoria dinámica en las super-cubetas gruesas y finas. La inserción, reasignación y redistribución continua de elementos entre listas dinámicas (\lstinline{std::deque}) consume gran cantidad de ciclos de reloj por operaciones de asignación de memoria (\textit{allocation}) y destruye la localidad de caché en la CPU, evidenciando que las estructuras de datos complejas requieren de una micro-optimización extrema para ser competitivas.
-
-\subsection{Variables de Diseño y Operaciones}
-
-Al analizar las operaciones de relajación en la Fig.~\ref{fig:g2_ops}, se comprueba que Dijkstra, Thorup y DMMSY realizan exactamente el mismo número de operaciones para un mismo grafo y origen. Esto es coherente con su naturaleza de exploración en orden de distancias mínimas: cada arista útil se examina y relaja exactamente una vez. En contraste, Bellman-Ford ejecuta un número de operaciones significativamente mayor (hasta $163\times$ más), ya que examina múltiples aristas repetidamente en rondas consecutivas antes de converger. El hecho de que Bellman-Ford sea más rápido en algunas zonas a pesar de realizar muchas más operaciones subraya la importancia del costo de las estructuras de datos (la cola de prioridad frente al vector plano).
-
-\subsection{Ventajas y Limitaciones}
-
-Las principales ventajas del estudio radican en el diseño factorial cruzado y en la homogeneidad de la implementación en C++17, lo que permite comparaciones limpias de tiempos. La limitación central es el uso de versiones educativas simplificadas para Thorup y DMMSY, lo que restringe las conclusiones a las variantes analizadas. Asimismo, el uso exclusivo de grafos sintéticos con pesos uniformes representa un escenario controlado que puede diferir de la distribución de pesos en redes reales (como redes viales con correlaciones espaciales).
+Respecto a las operaciones de relajación (Fig.~\ref{fig:g2_ops}), Dijkstra, Thorup y DMMSY realizan exactamente el mismo número para un mismo grafo, mientras que Bellman-Ford ejecuta hasta $163\times$ más. El hecho de que Bellman-Ford sea más rápido en ciertas zonas pese a más operaciones subraya la importancia del costo de las estructuras de datos. Las principales limitaciones del estudio son el uso de versiones educativas simplificadas para Thorup y DMMSY, y el empleo exclusivo de grafos sintéticos con pesos uniformes.
 
 \section{Conclusiones}
 
@@ -601,7 +533,11 @@ El análisis experimental y teórico desarrollado en este proyecto permite estab
     \item Como trabajo futuro, se propone la paralelización del algoritmo determinista para procesar grafos masivos, la optimización de las estructuras de Thorup a nivel de hardware, y la validación de estos resultados utilizando conjuntos de datos reales de redes de transporte y redes sociales.
 \end{itemize}
 
-\begin{thebibliography}{23}
+\clearpage
+\begin{thebibliography}{26}
+
+\item[] \noindent\textbf{Referencias Científicas}
+\smallskip
 
 \bibitem{dijkstra1959}
 E.~W. Dijkstra, ``A note on two problems in connexion with graphs,''
@@ -683,6 +619,18 @@ T.~H. Cormen, C.~E. Leiserson, R.~L. Rivest, and C.~Stein,
 \bibitem{johnson1977}
 D.~B. Johnson, ``Efficient algorithms for shortest paths in sparse networks,''
 \emph{Journal of the ACM}, vol.~24, no.~1, pp. 1--13, 1977.
+
+\bibitem{costa2025}
+J. Costa, L. Castro, and R. de Freitas Rodrigues, ``Exploring monotone priority queues for Dijkstra optimization,'' \emph{RAIRO - Operations Research}, Jun. 2025, doi: 10.1051/ro/2025082.
+
+\bibitem{lewis2023}
+R. Lewis, ``A comparison of Dijkstra's algorithm using Fibonacci heaps, binary heaps, and self-balancing binary trees,'' \emph{arXiv preprint arXiv:2303.10034}, 2023.
+
+\bibitem{idowu2025}
+A. I. Idowu, S. O. Olabiyisi, O. O. Alo, I. A. Adeleke, A. A. Jokotoye, and A. L. Omotade, ``Comparative performance analysis of some priority queue variants in Dijkstra's algorithm,'' \emph{International Journal of Research and Scientific Innovation (IJRSI)}, vol. 12, no. 8, 2025, doi: 10.51244/IJRSI.2025.120800078.
+
+\item[] \bigskip\noindent\textbf{Herramientas y Software}
+\smallskip
 
 \bibitem{cppreference_chrono}
 Cppreference.com, ``std::chrono::high\_resolution\_clock,'' 2024. [En línea].

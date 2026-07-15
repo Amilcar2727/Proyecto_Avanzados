@@ -184,6 +184,14 @@ INPUT C:\Program Files\MiKTeX\tex\latex\graphics\mathcolor.ltx
 INPUT C:\Program Files\MiKTeX\tex\latex\graphics\mathcolor.ltx
 INPUT C:\Program Files\MiKTeX\tex\latex\multirow\multirow.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\multirow\multirow.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithms\algorithm.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithms\algorithm.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\ifthen.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\ifthen.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithmicx\algpseudocode.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithmicx\algpseudocode.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithmicx\algorithmicx.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\algorithmicx\algorithmicx.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
@@ -348,23 +356,11 @@ INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\courier\pcrr8t.vf
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\courier\pcrr8t.vf
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8r.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrb8t.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8t.tfm
 INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\times\ptmb8t.vf
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmb8r.tfm
-INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\times\ptmr8t.vf
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmr8r.tfm
-INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\courier\pcrb8t.vf
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrb8r.tfm
-INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\courier\pcrr8t.vf
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8r.tfm
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
-INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmrc8t.tfm
+INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\times\ptmrc8t.vf
+INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmr8r.tfm
 INPUT .\figuras\grafica1_tiempo_vs_densidad.png
 INPUT .\figuras\grafica1_tiempo_vs_densidad.png
 INPUT .\figuras\grafica1_tiempo_vs_densidad.png
@@ -389,8 +385,6 @@ INPUT .\figuras\grafica3_heatmap_ganador.png
 INPUT .\figuras\grafica3_heatmap_ganador.png
 INPUT .\figuras\grafica3_heatmap_ganador.png
 INPUT .\figuras\grafica3_heatmap_ganador.png
-INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\times\ptmrc8t.vf
-INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmr8r.tfm
 INPUT .\figuras\grafica4_scaling_n.png
 INPUT .\figuras\grafica4_scaling_n.png
 INPUT .\figuras\grafica4_scaling_n.png
@@ -399,6 +393,7 @@ INPUT .\figuras\grafica4_scaling_n.png
 INPUT .\figuras\grafica4_scaling_n.png
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrrc8t.tfm
 INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\courier\pcrrc8t.vf
+INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\courier\pcrr8r.tfm
 INPUT C:\Program Files\MiKTeX\fonts\vf\adobe\times\ptmri8t.vf
 INPUT C:\Program Files\MiKTeX\fonts\tfm\adobe\times\ptmri8r.tfm
@@ -431,8 +426,6 @@ INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy8.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy8.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy9.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy9.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\urw\courier\ucrb8a.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\urw\courier\ucrb8a.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\urw\courier\ucrr8a.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\urw\courier\ucrr8a.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\urw\times\utmb8a.pfb
